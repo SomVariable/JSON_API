@@ -1,0 +1,6 @@
+{
+    "serverPort": "5000",
+    "dbUrl": "mongodb+srv://Ihor:Q1q2w3e4r5t6y@cluster0.vohon.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "password": "Q1q...",
+    "currIp": "141.101.7.62/32"
+}
