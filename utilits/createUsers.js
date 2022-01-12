@@ -1,5 +1,3 @@
-const fs = require('fs')
-const path = require('path')
 const {data} = require('./dataForCreateUsers')
 const users = [];
 
@@ -11,7 +9,8 @@ const createUsers = (quantity) => {
                                                                 :Math.floor(Math.random()*data.womenNames.length)
         const randomintegerForAvatars = Math.floor(Math.random()*data.avatars.length)
         const randomintegerForCityes = Math.floor(Math.random()*data.cityes.length)
-        const follow = randomIntForGeneration > 5
+        const followers = []
+
         const name = randomIntForGeneration > 5
                         ?data.menNames.slice(randomintegerForNames, randomintegerForNames+1).join('')
                         :data.womenNames.slice(randomintegerForNames, randomintegerForNames+1).join('')
@@ -19,9 +18,10 @@ const createUsers = (quantity) => {
         const avatar = data.avatars.slice(randomintegerForAvatars, randomintegerForAvatars+1).join('')
         const sex = randomIntForGeneration > 5? 'man' : 'women'
         users.push({
+            email: `somEmail${i}@gmai.com`,
+            password: 'ghreaeihvaewuviwuphgweigsdfniofewihf',
             name: name,
             sex: sex,
-            follow: follow,
             city: city,
             avatar: avatar
         })
@@ -29,9 +29,28 @@ const createUsers = (quantity) => {
 }
 
 
-const saveUsersToFile = (users) => {
-    fs.writeFileSync("hello.txt", JSON.stringify(users, null, '\t'))
+const saveUserToDataBase = async (url, user) => {
+    try {
+        const response = await fetch(url, {
+          method: 'POST', // или 'PUT'
+          body: JSON.stringify(user), 
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        const json = await response.json();
+        console.log('Успех:', JSON.stringify(json));
+      } catch (error) {
+        console.error('Ошибка:', error);
+      }
 }
 
-createUsers(300)
-saveUsersToFile(users)
+const addUsersToDB = (users) => {
+    for(let userId = 0; userId <= users.length; userId++){
+        saveUserToDataBase('http://localhost:5000/api/auth/registration', users[userId])
+    }
+    
+}
+
+createUsers(10)
+addUsersToDB(users)
