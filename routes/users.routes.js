@@ -13,11 +13,20 @@ router.get('/count', async (req, res) => {
 })
 
 router.get('/users', async (req, res) => {
-    const maxCount = 10
-    const s = req.query.count <= maxCount? req.query.count : maxCount
-
-    res.send(JSON.stringify(users.slice(0, s), null, '\t'))
+    const limit = 10;
+    const countToInt = req.query.count - 0
+    const countUser = countToInt <= limit? countToInt : limit;
+    const quantity = await User.collection.countDocuments()
+    try{
+        const users = await User.find({}).limit(countUser)
+        return res.status(400).json({
+                                     data: {users: users},
+                                     meta: {count: quantity}
+                                    })
+    }catch(e){
+        console.log(e)
+        res.send({message: "Server error"})
+    }
 })
-
 
 module.exports = router

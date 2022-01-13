@@ -1,11 +1,13 @@
 const Router = require("express");
 const User = require("../models/User")
 const router = new Router()
+const config = require("config")
+const jwt = require("jsonwebtoken")
+
 
 router.post('/registration', async (req, res) => {
     try{
         const {email, password, name, sex, city, avatar} = req.body
-        console.log(email, password, name, sex, city, avatar)
         const candidate = await User.findOne({email})
 
         if(candidate) {
@@ -15,7 +17,7 @@ router.post('/registration', async (req, res) => {
         const user = new User({email, password, name, sex, city, avatar})
         await user.save()
 
-        return res.status(400).json({message: `User was created`})
+        return res.json({message: `User was created`})
     }catch(e){
         console.log(e)
         res.send({message: "Server error"})
@@ -23,27 +25,38 @@ router.post('/registration', async (req, res) => {
 })
 
 
-router.get('/count', async (req, res) => {
+router.post('/login', async (req, res) => {
     try{
-        const quantity = await User.collection.countDocuments()
-        console.log(quantity)
-        return res.status(400).json({count: quantity})
+        const {email, password} = req.body
+        const user = await User.findOne({email})
+
+        if(!user) {
+            return res.status(404).json({message: `There is no user with email: ${email}`})
+        }
+        
+        const isPasswordValid = user.password === password
+
+        if(!isPasswordValid){
+            return res.status(400).json({message: `wrong Password`})
+        }
+
+        const token = jwt.sign({id: user.id}, config.get("secretKey"), {expiresIn: "1h"})
+        return res.json({message: {
+            token,
+            user: {
+                id:  user.id,
+                email:user.email,
+                name: user.name,
+                sex:user.sex,
+                city: user.city
+            }
+        }})
     }catch(e){
         console.log(e)
         res.send({message: "Server error"})
     }
 })
 
-router.get('/users', async (req, res) => {
-    try{
-        const users = await User.find({}).skip(3).limit(3)
-        console.log(users)
-        return res.status(400).json({count: users})
-    }catch(e){
-        console.log(e)
-        res.send({message: "Server error"})
-    }
-})
 
 
 module.exports = router
