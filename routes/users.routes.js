@@ -13,15 +13,26 @@ router.get('/count', async (req, res) => {
 })
 
 router.get('/users', async (req, res) => {
+    console.log(req.query)
     const limit = 10;
-    const countToInt = req.query.count - 0
-    const countUser = countToInt <= limit? countToInt : limit;
+    const countToInt = !!req.query.count? req.query.count : limit
+    const countUser = countToInt <= limit? countToInt -0: limit;
+    console.log(countToInt)
+    console.log('countUser: ', countUser)
     const quantity = await User.collection.countDocuments()
+    const countPages = Math.ceil(quantity / countUser)
+    //if page === false current page === 0
+    const currentPage= !!req.query.page?req.query.page - 1:0
+    const skipedUsers = currentPage * countUser
+    console.log(skipedUsers)
+
     try{
-        const users = await User.find({}).limit(countUser)
+        const users = await User.find({}).skip(skipedUsers).limit(countUser)
         return res.status(400).json({
                                      data: {users: users},
-                                     meta: {count: quantity}
+                                     meta: {count: quantity,
+                                            countPages: countPages
+                                        }
                                     })
     }catch(e){
         console.log(e)
