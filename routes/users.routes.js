@@ -5,7 +5,7 @@ const router = new Router()
 router.get('/count', async (req, res) => {
     try{
         const quantity = await User.collection.countDocuments()
-        return res.status(400).json({count: quantity})
+        return res.json({count: quantity})
     }catch(e){
         console.log(e)
         res.send({message: "Server error"})
@@ -28,7 +28,7 @@ router.get('/users', async (req, res) => {
 
     try{
         const users = await User.find({}).skip(skipedUsers).limit(countUser)
-        return res.status(400).json({
+        return res.json({
                                      data: {users: users},
                                      meta: {count: quantity,
                                             countPages: countPages
