@@ -16,16 +16,16 @@ router.get('/users', async (req, res) => {
     console.log(req.query)
     const limit = 10;
     const countToInt = !!req.query.count? req.query.count : limit
-    const countUser = countToInt <= limit? countToInt -0: limit;
-    console.log(countToInt)
-    console.log('countUser: ', countUser)
+    let countUser = countToInt <= limit? countToInt -0: limit;
     const quantity = await User.collection.countDocuments()
     const countPages = Math.ceil(quantity / countUser)
     //if page === false current page === 0
     const currentPage= !!req.query.page?req.query.page - 1:0
-    const skipedUsers = currentPage * countUser
-    console.log(skipedUsers)
-
+    let skipedUsers = currentPage * countUser
+    if(req.query.user) {
+        skipedUsers = req.query.user - 1;
+        countUser = 1
+    }
     try{
         const users = await User.find({}).skip(skipedUsers).limit(countUser)
         return res.json({
