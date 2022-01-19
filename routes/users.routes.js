@@ -22,11 +22,10 @@ router.get('/users', async (req, res) => {
     //if page === false current page === 0
     const currentPage= !!req.query.page?req.query.page - 1:0
     let skipedUsers = currentPage * countUser
-    if(req.query.user) {
-        skipedUsers = req.query.user - 1;
-        countUser = 1
+    if(req.query.userId) {
+        const userId = req.query.userId;
         try{
-            const user = await User.find({}).skip(skipedUsers).limit(countUser)
+            const user = await User.find({_id: userId})
             return res.json({
                                          data: {user: user[0]},
                                          meta: {count: quantity,
