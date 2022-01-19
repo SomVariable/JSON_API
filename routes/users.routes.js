@@ -25,19 +25,38 @@ router.get('/users', async (req, res) => {
     if(req.query.user) {
         skipedUsers = req.query.user - 1;
         countUser = 1
+        try{
+            const user = await User.find({}).skip(skipedUsers).limit(countUser)
+            return res.json({
+                                         data: {user: user[0]},
+                                         meta: {count: quantity,
+                                                countPages: countPages
+                                            }
+                                        })
+        }catch(e){
+            console.log(e)
+            res.send({message: "Server error"})
+        }
+
+    }else{
+        try{
+            const users = await User.find({}).skip(skipedUsers).limit(countUser)
+            return res.json({
+                                         data: {users: users},
+                                         meta: {count: quantity,
+                                                countPages: countPages
+                                            }
+                                        })
+        }catch(e){
+            console.log(e)
+            res.send({message: "Server error"})
+        }
     }
-    try{
-        const users = await User.find({}).skip(skipedUsers).limit(countUser)
-        return res.json({
-                                     data: {users: users},
-                                     meta: {count: quantity,
-                                            countPages: countPages
-                                        }
-                                    })
-    }catch(e){
-        console.log(e)
-        res.send({message: "Server error"})
-    }
+    
 })
+
+const requestUsers = () => {
+    
+}
 
 module.exports = router

@@ -7,11 +7,11 @@ const corsMiddleware = require('./middleware/corsMiddlware.middleware')
 const authRouter = require("./routes/auth.routes")
 const usersRouter = require("./routes/users.routes")
 
-
 app.use(corsMiddleware)
 app.use(express.json())
-app.use("/api/auth", authRouter)    
+app.use("/api/auth", authRouter)  
 app.use("/api", usersRouter)
+
 
 const start = async () => {
     try {
